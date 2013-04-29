@@ -83,6 +83,10 @@ public class Message {
 		}
 	}
 	
+	/**
+	 * Fijar el tipo de mensaje que se almacena
+	 * @param type el tipo de paquete usando las variables de la clase
+	 */
 	public void setType(byte type) {
 		boolean validType = true;
 		
@@ -111,15 +115,24 @@ public class Message {
 				break;
 		}
 		
+		// Comprobar que sea un tipo valido
 		if (validType) {
 			this.type = type;
 		}
 	}
 	
+	/**
+	 * Obtener el tipo de paquete que se esta almacenando
+	 * @return el tipo de paquete en formato byte
+	 */
 	public byte getPacket() {
 		return this.packet;
 	}
 	
+	/**
+	 * Obtener el tipo de paquete que se esta almacenando
+	 * @return el tipo de paquete en formato String
+	 */
 	public String getPacketLiteral(){
 		switch(this.packet){
 		case PKT_CMD:
@@ -135,6 +148,10 @@ public class Message {
 		}
 	}
 	
+	/**
+	 * Fijar el tipo de paquete que se esta almacenando
+	 * @param packet tipo de paquete en formato de las variables de la clase
+	 */
 	public void setPacket(byte packet) {
 		boolean validPacket = true;
 		
@@ -153,19 +170,32 @@ public class Message {
 				break;
 		}
 		
+		// Comprobar que sea un tipo valido
 		if (validPacket == true) {
 			this.packet = packet;
 		}
 	}
 	
+	/**
+	 * Obtener el array de argumentos almacenados
+	 * @return Array de Strings que forman los argumentos
+	 */
 	public String[] getArgs() {
 		return this.args;
 	}
 	
+	/**
+	 * Fijar los argumentos que se almacenan
+	 * @param args Array de Strings con los argumentos
+	 */
 	public void setArgs(String[] args) {
 		this.args = args;
 	}
 	
+	/**
+	 * Comprobar si el mensaje esta completo y es v‡lido
+	 * @return Boolean indicando la validez del mensaje
+	 */
 	public boolean isValid() {
 		boolean valido = true;
 		
@@ -216,18 +246,33 @@ public class Message {
 		return valido;
 	}
 	
+	/**
+	 * Obtener el time stamp de creacion del mensaje
+	 * @return Date indicando el time stamp
+	 */
 	public Date getTimeStamp() {
 		return this.timeStamp;
 	}
 	
+	/**
+	 * Obtener el usuario del mensaje
+	 * @return User con el usuario del mensaje
+	 */
 	public User getUser() {
 		return user;
 	}
 
+	/**
+	 * Fijar el usuario del mensaje que se esta almacenando
+	 * @param user User del mensaje
+	 */
 	public void setUser(User user) {
 		this.user = user;
 	}
 	
+	/**
+	 * Metodo de debug del mensaje para errores y debug
+	 */
 	public void showInfo() {
 		System.out.println("\n[MESSAGE]");
 		System.out.println(" Paquete con TimeStamp: "+this.getTimeStamp());

@@ -1,5 +1,4 @@
 package es.uniovi;
-
 import java.util.concurrent.ArrayBlockingQueue;
 
 /**

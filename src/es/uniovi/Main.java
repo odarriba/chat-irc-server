@@ -12,6 +12,12 @@ public class Main extends Thread {
 	private BufferMessages bufferOutput;
 	private NetworkOut netOut;
 	
+	/**
+	 * Constructor de la clase Main, donde se crearan todos los objetos necesarios para arrancar el servidor.
+	 * Ademas se crean los diferentes hilos pero sin lanzarlos aun.
+	 * @param port Puerto de la aplicacion
+	 * @param debug Boolean indicando si se activa el modo debug
+	 */
 	public Main(Integer port, Boolean debug) {
 		this.port = port;
 		this.debug = debug;
@@ -24,6 +30,7 @@ public class Main extends Thread {
 		this.bufferOutput = new BufferMessages();
 		
 		this.netOut = new NetworkOut(this.bufferOutput, this.global);
+		// TODO: Aqui se crearian los objetos de los hilos de procesamiento
 	}
 	
 	public void run() {
@@ -40,6 +47,7 @@ public class Main extends Thread {
 		
 		// Intentar abrir el socket principal
 		System.out.println("INFO: Arrancando el servidor en el puerto "+this.port+"...");
+		
 		try {
 			socketPrincipal = new ServerSocket(this.port);
 		} catch (IOException e) {
@@ -52,6 +60,7 @@ public class Main extends Thread {
 		
 		// Arrancar los diferentes hilos iniciales de la aplicaci—n
 		this.netOut.start();
+		// TODO: Aqui se arrancarian los hilos de procesamiento necesarios
 		
 		while(this.global.isRunning()) {
 			try {
@@ -63,6 +72,7 @@ public class Main extends Thread {
 				this.global.addUser(usuario);
 				
 				// Crear el hilo de lectura de este usuario en particular
+				// TODO: Aqui se crearia y se lanzaria el hilo NetworkIn del usuario recien conectado.
 				
 			} catch (IOException e) {
 				// En caso de error notificar al adminsitrador y volver a ejecutar el bucle.
