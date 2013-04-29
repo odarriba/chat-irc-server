@@ -36,7 +36,6 @@ public class NetworkOut extends Thread {
 				outputMsg = this.bufferOutput.get();
 			} catch (InterruptedException e) {
 				System.err.println("ERROR: Error al obtener un mensaje desde el buffer de salida a red.");
-				System.err.println(e.getMessage());
 				e.printStackTrace();
 			}
 			
@@ -51,7 +50,6 @@ public class NetworkOut extends Thread {
 				}
 			} catch(IOException e){
 				System.err.println("ERROR: Error al enviar el mensaje saliente a la red.");
-				System.err.println(e.getMessage());
 				e.printStackTrace();
 			}
 		}

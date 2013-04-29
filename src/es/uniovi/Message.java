@@ -243,6 +243,14 @@ public class Message {
 				break;
 		}
 		
+		// Comprobar que se ha fijado un usuario
+		if (this.user == null) {
+			valido = false;
+		}else if (!this.user.isValid()) {
+			// Si el usuario no es valido, el paquete tampoco
+			valido = false;
+		}
+		
 		return valido;
 	}
 	

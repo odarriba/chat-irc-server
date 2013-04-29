@@ -38,11 +38,11 @@ public class Main extends Thread {
 		Integer usersAccepted=0;
 		
 		// Mensaje de cabecera con version y fecha de compilacion
-		System.out.println("Servidor de Chat v"+this.global.getVersion()+" ("+this.global.getCompilationdate());
-		System.out.println("-----------------------------------------------");
+		System.out.println("Servidor de ChatIRC v"+this.global.getVersion()+" ("+this.global.getCompilationdate()+")");
+		System.out.println("--------------------------------------");
 		
 		if (this.global.getDebug()) { 
-			System.out.println("INFO: Arrancando en modo DEBUG.");
+			System.out.println("INFO: Servidor en modo DEBUG.");
 		}
 		
 		// Intentar abrir el socket principal
@@ -53,7 +53,6 @@ public class Main extends Thread {
 		} catch (IOException e) {
 			// En caso de error notificar al adminsitrador y salir de la ejecucion.
 			System.err.println("ERROR: Error al intentar abrir un socket en el puerto "+this.port);
-			System.err.println(e.getMessage());
 			e.printStackTrace();
 			return;
 		}
@@ -77,7 +76,6 @@ public class Main extends Thread {
 			} catch (IOException e) {
 				// En caso de error notificar al adminsitrador y volver a ejecutar el bucle.
 				System.err.println("ERROR: Error al aceptar las peticiones en el socket principal.");
-				System.err.println(e.getMessage());
 				e.printStackTrace();
 			}
 		}
