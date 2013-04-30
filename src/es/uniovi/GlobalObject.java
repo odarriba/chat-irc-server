@@ -17,6 +17,8 @@ public class GlobalObject {
 	
 	public GlobalObject() {
 		this.running = true;
+		this.nickUsers = new HashMap<String,User>();
+		this.roomUsers = new HashMap<String,User[]>();
 	}
 
 	/**
@@ -84,6 +86,8 @@ public class GlobalObject {
 	 * @param user Usuario a eliminar
 	 */
 	public synchronized void deleteUser(User user) {
+		// TODO: Abria que eliminar al usuario de las salas (y emitir los consiguientes mensajes) 
+		// antes de eliminarlo de los objetos compartidos.
 		nickUsers.remove(user.getNick());
 	}
 	

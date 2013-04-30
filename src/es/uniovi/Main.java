@@ -35,6 +35,7 @@ public class Main extends Thread {
 	
 	public void run() {
 		Socket socketAccepted;
+		NetworkIn netIn;
 		Integer usersAccepted=0;
 		
 		// Mensaje de cabecera con version y fecha de compilacion
@@ -71,7 +72,7 @@ public class Main extends Thread {
 				this.global.addUser(usuario);
 				
 				// Crear el hilo de lectura de este usuario en particular
-				// TODO: Aqui se crearia y se lanzaria el hilo NetworkIn del usuario recien conectado.
+				netIn = new NetworkIn(usuario, this.global, this.bufferInput);
 				
 			} catch (IOException e) {
 				// En caso de error notificar al adminsitrador y volver a ejecutar el bucle.
