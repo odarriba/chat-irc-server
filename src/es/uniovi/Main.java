@@ -36,6 +36,7 @@ public class Main extends Thread {
 	public void run() {
 		Socket socketAccepted;
 		NetworkIn netIn;
+		Message msgWelcome;
 		Integer usersAccepted=0;
 		
 		// Mensaje de cabecera con version y fecha de compilacion
@@ -68,11 +69,28 @@ public class Main extends Thread {
 				usersAccepted++;
 				
 				// Crear el usuario y registrarlo
-				User usuario = new User("An—nimo"+usersAccepted, socketAccepted);
-				this.global.addUser(usuario);
+				User user = new User("An—nimo"+usersAccepted, socketAccepted);
+				this.global.addUser(user);
 				
 				// Crear el hilo de lectura de este usuario en particular
-				netIn = new NetworkIn(usuario, this.global, this.bufferInput);
+				netIn = new NetworkIn(user, this.global, this.bufferInput);
+				
+				
+				System.out.println("INFO: Mensaje de bienvenida enviado a usuario "+user.getCompleteInfo());
+				
+				// Crear el mensaje de bienvenida y enviarlo
+				msgWelcome = new Message();
+				msgWelcome.setType(Message.TYPE_HELLO);
+				msgWelcome.setPacket(Message.PKT_OK);
+				msgWelcome.setArgs(new String[]{"Bienvenido a Servidor de ChatIRC v"+this.global.getVersion()+" ("+this.global.getCompilationdate()+")"});
+				msgWelcome.setUser(user);
+				
+				try {
+					this.bufferOutput.put(msgWelcome);
+				} catch(InterruptedException e) {
+					System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+user.getCompleteInfo());
+					e.printStackTrace();
+				}
 				
 			} catch (IOException e) {
 				// En caso de error notificar al adminsitrador y volver a ejecutar el bucle.

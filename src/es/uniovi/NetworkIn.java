@@ -38,7 +38,7 @@ public class NetworkIn extends Thread {
 				this.inputStream = new DataInputStream(this.socket.getInputStream());
 			}
 		} catch (IOException e) {
-			System.err.println("ERROR: Error al crear el listener para escuchar al puerto "+this.socket.getInetAddress().getHostAddress()+":"+this.socket.getPort());
+			System.err.println("ERROR: Error al crear el listener para escuchar al usuario "+this.user.getCompleteInfo());
 		}
 		
 		// Lanzar el hilo
@@ -47,7 +47,7 @@ public class NetworkIn extends Thread {
 	
 	public void run() {
 		Message msg;
-		System.out.println("INFO: Creado listener para el cliente en: "+this.socket.getInetAddress().getHostAddress());
+		System.out.println("INFO: Creado listener para el cliente "+this.user.getCompleteInfo());
 		
 		while(this.global.isRunning() && this.threadRunning) {
 			msg = new Message(); // Limpiar la variable
@@ -57,7 +57,7 @@ public class NetworkIn extends Thread {
 			} catch (IOException e) {
 				if (this.socket.isClosed() || this.socket.isConnected() == false) {
 					// Se ha cerrado el socket, borrar los datos del usuario y cancelar la ejecucion de este hilo
-					System.out.println("INFO: Se ha detectado la desconexion brusca de "+this.user.getNick()+" en el socket "+this.socket.getInetAddress().getHostAddress()+". Se dispone a eliminarlo del sistema.");
+					System.out.println("INFO: Se ha detectado la desconexion brusca de "+this.user.getCompleteInfo()+". Se dispone a eliminarlo del sistema.");
 					this.global.deleteUser(this.user);
 					
 					// Cerrar el listener
@@ -67,6 +67,12 @@ public class NetworkIn extends Thread {
 			
 			// Comprobar que el mensaje leido este completo y sea valido
 			if (msg.isValid()) {
+				// Si esta activado el debug, mostrar la informacion
+				if (this.global.getDebug()) {
+					System.out.println("DEBUG: Traza del mensaje recibido de "+this.user.getCompleteInfo()+" :");
+					msg.showInfo();
+				}
+				
 				try {
 					// Introducirlo en el buffer de entrada
 					this.bufferInput.put(msg);
@@ -75,6 +81,9 @@ public class NetworkIn extends Thread {
 					msg.showInfo(); // Mostrar la info del error
 					e.printStackTrace();
 				}
+			} else {
+				System.err.println("ERROR: Recibido mensaje no-valido desde el usuario "+this.user.getCompleteInfo());
+				msg.showInfo();
 			}
 		}
 	}

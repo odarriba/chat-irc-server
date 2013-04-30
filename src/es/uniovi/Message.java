@@ -282,7 +282,7 @@ public class Message {
 	 * Metodo de debug del mensaje para errores y debug
 	 */
 	public void showInfo() {
-		System.out.println("\n[MESSAGE]");
+		System.out.println("[MESSAGE]");
 		System.out.println(" Paquete con TimeStamp: "+this.getTimeStamp());
 		System.out.println(" ----------------------------------------");
 		
@@ -299,6 +299,6 @@ public class Message {
 			System.out.println(" - Argumento "+(n+1)+": "+args[n]);
 		}
 		
-		System.out.println("[/MESSAGE]\n");
+		System.out.println("[/MESSAGE]");
 	}
 }

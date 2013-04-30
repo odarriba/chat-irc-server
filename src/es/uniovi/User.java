@@ -24,6 +24,15 @@ public class User {
 	}
 	
 	/**
+	 * Obtiene informacion del usuario y del socket al que se conecta de una forma unica para
+	 * todo el servidor
+	 * @return String con la informacion
+	 */
+	public String getCompleteInfo() {
+		return this.getNick()+"@"+this.getSocket().getInetAddress().getHostAddress()+":"+this.getSocket().getPort();
+	}
+	
+	/**
 	 * Obtener el nick del usuario
 	 * @return String del nick
 	 */
