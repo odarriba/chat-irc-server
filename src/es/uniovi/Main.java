@@ -2,6 +2,7 @@ package es.uniovi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 
 public class Main extends Thread {
 	public Integer port;
@@ -10,6 +11,8 @@ public class Main extends Thread {
 	private ServerSocket socketPrincipal;
 	private NetworkOut netOut;
 	private Processing process;
+	static Semaphore leer;
+	static Semaphore escribir;
 	
 	/**
 	 * Constructor de la clase Main, donde se crearan todos los objetos necesarios para arrancar el servidor.
@@ -28,7 +31,7 @@ public class Main extends Thread {
 		// Arrancar los hilos necesarios
 		
 		this.netOut = new NetworkOut(this.global);
-		this.process = new Processing(this.global);
+		this.process = new Processing(this.global, leer, escribir);
 		// TODO: Aqui se crearian los objetos de los hilos de procesamiento
 	}
 	
@@ -73,7 +76,7 @@ public class Main extends Thread {
 				this.global.addUser(user);
 				
 				// Crear el hilo de lectura de este usuario en particular
-				netIn = new NetworkIn(user, this.global);
+				netIn = new NetworkIn(user, this.global, leer, escribir);
 				
 				
 				System.out.println("INFO: Mensaje de bienvenida enviado a usuario "+user.getCompleteInfo());
@@ -108,6 +111,8 @@ public class Main extends Thread {
 		Boolean debug = false;
 		Main main;
 		
+		leer = new Semaphore(0);
+		escribir = new Semaphore(100);
 		// Si no hay los suficientes parametros o si se solicita la ayuda, mostrar el mensaje.
 		if (args.length < 1 || args[0].equals("-h") || args[0].equals("--help")) {
 			System.err.println("Uso: ServidorChatIRC <puerto> [-d | --debug]");

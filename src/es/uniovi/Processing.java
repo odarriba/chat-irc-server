@@ -15,6 +15,7 @@ public class Processing extends Thread{
 	private GlobalObject global;
 	private BufferMessages bufferInput;
 	private BufferMessages bufferOutput;	
+	
 	Semaphore leer;
 	Semaphore escribir;
 	private Boolean threadRunning;
@@ -23,10 +24,12 @@ public class Processing extends Thread{
 	String cadena;
 	String nick_old;
 
-	public Processing(GlobalObject global) {
+	public Processing(GlobalObject global, Semaphore leer, Semaphore escribir) {
 		this.global=global;
 		this.bufferInput=global.getBufferInput();
 		this.bufferOutput=global.getBufferOutput();
+		this.leer = leer;
+		this.escribir = escribir;
 	}
 
 	/**

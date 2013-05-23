@@ -1,19 +1,21 @@
 package es.uniovi;
 import java.net.Socket;
+import java.util.concurrent.Semaphore;
 import java.io.DataInputStream;
 import java.io.IOException;
 
 /**
  * Clase para escuchar a cada socket de usuario de forma independiente y convertir sus mensajes
- * al formato interno para poder aÔøΩadirlos al buffer de entrada.
+ * al formato interno para poder a–adirlos al buffer de entrada.
  */
 public class NetworkIn extends Thread {
 	private User user;
 	private DataInputStream inputStream;
 	private Socket socket;
 	private GlobalObject global;
-	private BufferMessages bufferInput;
 	private Boolean threadRunning;	// Varibale para asegurar que el hilo se cierrfe independientemente cuando sea necesario
+	Semaphore leer;
+	Semaphore escribir;
 	
 	/**
 	 * Constructor de la clase NetworkIn que se autolanza
@@ -21,12 +23,15 @@ public class NetworkIn extends Thread {
 	 * @param global Variable global comun
 	 * @param bufferInput Buffer de mensajes de entrada
 	 */
-	public NetworkIn(User user, GlobalObject global) {
+	public NetworkIn(User user, GlobalObject global, Semaphore leer, Semaphore escribir) {
 		// Asignar las variables de la clase
 		this.user = user;
 		this.global = global;
-		this.bufferInput = global.getBufferInput();
 		this.threadRunning = true;
+		this.leer = leer;
+		this.escribir = escribir;
+		
+		
 		
 		// Intentar obtener el socket y el InputStream
 		try {
@@ -75,7 +80,9 @@ public class NetworkIn extends Thread {
 				
 				try {
 					// Introducirlo en el buffer de entrada
-					this.bufferInput.put(msg);
+					escribir.acquire();
+					global.getBufferInput().put(msg);
+					leer.release();
 				} catch (InterruptedException e) {
 					System.err.println("ERROR: Error al introducir el mensaje: ");
 					msg.showInfo(); // Mostrar la info del error
@@ -100,9 +107,9 @@ public class NetworkIn extends Thread {
 	
 	private Message readMessage() throws IOException {
 		Message msg;		// El objeto a crear
-		short sizeLoad;		// TamaÔøΩo de la carga
+		short sizeLoad;		// Tama–o de la carga
 		short numArgs;		// Numero de argumentos
-		short sizeArg;		// TamaÔøΩo de cada argumento cuando se trate
+		short sizeArg;		// Tama–o de cada argumento cuando se trate
 		byte[] argBytes;	// Array de los bytes de cada argumento
 		String[] args;		// Array de los argumentos ya convertidos
 		
@@ -112,17 +119,17 @@ public class NetworkIn extends Thread {
 		msg.setPacket(this.inputStream.readByte());
 		msg.setType(this.inputStream.readByte());
 		
-		// Leer tama√±o de la carga
+		// Leer tamaÃ±o de la carga
 		sizeLoad = this.inputStream.readShort();
 		
 		if (sizeLoad > 0) { 
-			// Si hay carga, leer el n√∫mero de par√°metros
+			// Si hay carga, leer el nÃºmero de parÃ¡metros
 			numArgs = this.inputStream.readShort();
 			args = new String[numArgs];
 			
 			// Procesar los argumentos recibidos
 			for(int n=0; n<numArgs; n++) {
-				// Tama√±o en bytes del argumento
+				// TamaÃ±o en bytes del argumento
 				sizeArg = this.inputStream.readShort();
 				
 				if (sizeArg > 0){
@@ -139,7 +146,7 @@ public class NetworkIn extends Thread {
 			args = new String[0];
 		}
 		
-		// Almacenar argumentos y aÔøΩadir el usuario
+		// Almacenar argumentos y a–adir el usuario
 		msg.setArgs(args);
 		msg.setUser(this.user);
 		
