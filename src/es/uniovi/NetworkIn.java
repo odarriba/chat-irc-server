@@ -1,6 +1,5 @@
 package es.uniovi;
 import java.net.Socket;
-import java.util.concurrent.Semaphore;
 import java.io.DataInputStream;
 import java.io.IOException;
 

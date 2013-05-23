@@ -2,7 +2,6 @@ package es.uniovi;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Semaphore;
 
 public class Main extends Thread {
 	public Integer port;
@@ -10,6 +9,7 @@ public class Main extends Thread {
 	private GlobalObject global;
 	private ServerSocket socketPrincipal;
 	private NetworkOut netOut;
+	private NetworkIn netIn;
 	private Processing process;
 	
 	/**
@@ -34,8 +34,10 @@ public class Main extends Thread {
 	}
 	
 	public void run() {
+		Panel p = new Panel();
+        p.build();
 		Socket socketAccepted;
-		NetworkIn netIn;
+		
 		Message msgWelcome;
 		Integer usersAccepted=0;
 		

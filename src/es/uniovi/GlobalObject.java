@@ -2,7 +2,6 @@ package es.uniovi;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import com.sun.swing.internal.plaf.synth.resources.synth;
 /**
  * Clase para contener las variables globales compartidas por los diferentes hilos, 
  * asegurando la sincronizacion de las operaciones que tengan que ser atomicas.

@@ -1,8 +1,8 @@
 package es.uniovi;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Semaphore;
+
+import javax.swing.tree.DefaultMutableTreeNode;
 
 /**
  * Esta clase realiza el procesamiento de los mensaje que se encuentra
@@ -101,20 +101,7 @@ public class Processing extends Thread{
 	 */
 	
 	private void processingUNKNOW(Message msg) {
-		msg.setType(Message.TYPE_MISC);
-		msg.setPacket(Message.PKT_ERR);
-		msg.setArgs(new String[]{"El comando introducido no esta contemplado en el protocolo"});
-		msg.setUser(msg.getUser());
-		
-		/* Finalmente lo escribimos en el buffer de salida */
-		try {
-			this.bufferOutput.put(msg);
-		} catch(InterruptedException e) {
-			System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-			e.printStackTrace();
-		}
-		
-		
+		constructMessage(Message.TYPE_MISC, Message.PKT_ERR, new String[]{"El comando introducido no esta contemplado en el protocolo"}, msg.getUser());
 	}
 
 
@@ -128,18 +115,7 @@ public class Processing extends Thread{
 	private void processingQUIT(Message msg) {
 		
 		/* Unicamente se genera un mensaje de tipo QUIT - OK y se le envia al origen */
-		msg.setType(Message.TYPE_QUIT);
-		msg.setPacket(Message.PKT_OK);
-		msg.setArgs(new String[]{msg.getUser().getNick()});
-		msg.setUser(msg.getUser());
-		
-		/* Finalmente lo escribimos en el buffer de salida */
-		try {
-			this.bufferOutput.put(msg);
-		} catch(InterruptedException e) {
-			System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-			e.printStackTrace();
-		}
+		constructMessage(Message.TYPE_QUIT, Message.PKT_OK, new String[]{msg.getUser().getNick()}, msg.getUser());
 		
 		global.deleteUser(msg.getUser());
 		
@@ -167,68 +143,23 @@ public class Processing extends Thread{
 				
 				
 			}
-			System.out.println(chain);
 			/* Se genera el mensaje de respuesta a el cliente */
+			constructMessage(Message.TYPE_WHO, Message.PKT_INF, new String[]{  args[0] + ";" + chain.substring(0 , chain.length() - 1) }, msg.getUser());
 			
-			msg.setType(Message.TYPE_WHO);
-			msg.setPacket(Message.PKT_INF);
-			msg.setArgs(new String[]{  args[0] + ";" + chain.substring(0 , chain.length() - 1) });
-			msg.setUser(msg.getUser());
-			
-			/* Finalmente lo escribimos en el buffer de salida */
-			try {
-				this.bufferOutput.put(msg);
-			} catch(InterruptedException e) {
-				System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-				e.printStackTrace();
-			}
 		}
-		else{
-			
+		else
 			/* Si no es asi generamos un mensake de error */ 
+			constructMessage(Message.TYPE_WHO, Message.PKT_ERR, new String[]{" La sala solicitada no existe actualmente" }, msg.getUser());
 			
-			msg.setType(Message.TYPE_WHO);
-			msg.setPacket(Message.PKT_ERR);
-			msg.setArgs(new String[]{" La sala solicitada no existe actualmente" });
-			msg.setUser(msg.getUser());
-			
-			/* Finalmente lo escribimos en el buffer de salida */
-			
-			try {
-				this.bufferOutput.put(msg);
-			} catch(InterruptedException e) {
-				System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-				e.printStackTrace();
-			}
-		}
-		
 	}
 
 	private void processingLIST(Message msg) {
 		
-		 if (global.noRooms()) {
-			 msg.setType(Message.TYPE_LIST);
-			 msg.setPacket(Message.PKT_ERR);
-			 msg.setArgs(new String[]{" ERROR: No hay salas abiertas" });
-			 msg.setUser(msg.getUser());
-			
-		}
-		 else
-			 {
-			 msg.setType(Message.TYPE_LIST);
-			 msg.setPacket(Message.PKT_OK);
-			 msg.setArgs( global.listRooms());
-			 msg.setUser(msg.getUser());
-			 }
-		 
-		try {
-		
-		/* Finalmente lo escribimos en el buffer de salida */
-		this.bufferOutput.put(msg);
-		} catch(InterruptedException e) {
-		System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-		e.printStackTrace();
-		}
+		 if (global.noRooms()) 
+			 constructMessage(Message.TYPE_LIST, Message.PKT_ERR, new String[]{" ERROR: No hay salas abiertas" }, msg.getUser());
+		else
+			 constructMessage( Message.TYPE_LIST, Message.PKT_OK,   global.listRooms() , msg.getUser() );
+			 
 	}
 
 	/**
@@ -244,25 +175,11 @@ public class Processing extends Thread{
 
 		String[] args = msg.getArgs(); /* Obtenemos los parametros del objeto mensaje, al ser de tipo NICK solo sera 1 y esta contendra el nuevo nick */
 
-		if (global.getNickUsers().containsKey(args[0])) {
-
+		if (global.getNickUsers().containsKey(args[0])) 
+			
 			// Comprobamos si el nick ya esta en uso y si es asi se crear el mensaje de error
 
-			msg.setType(Message.TYPE_NICK);
-			msg.setPacket(Message.PKT_ERR);
-			msg.setArgs(new String[]{"Nick ya en uso, por favor intentelo de nuevo"});
-			msg.setUser(msg.getUser());
-			try {
-
-				/* Finalmente lo escribimos en el buffer de salida */
-				this.bufferOutput.put(msg);
-			} catch(InterruptedException e) {
-				System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-				e.printStackTrace();
-			}
-
-
-		}
+			constructMessage(Message.TYPE_NICK, Message.PKT_ERR, new String[] {  "Nick ya en uso, por favor intentelo de nuevo" }, msg.getUser());
 
 		else{
 			/* En caso contrario se guardar el nick anterior y se realiza la modificacion */
@@ -273,45 +190,16 @@ public class Processing extends Thread{
 
 			/* Ya solo quedaria por una parte avisar a todos los participantes, comando INFO,  que compartan sala con el usuario */
 
-			Message msgout = new Message();
-			msgout.setPacket(Message.PKT_OK);
-			msgout.setType(Message.TYPE_NICK);
-			msgout.setArgs(new String[]{ nick_old + ";" + msg.getUser().getNick()});
-			msgout.setUser(msg.getUser());
-
-			try {
-
-				/* Finalmente lo escribimos en el buffer de salida */
-				this.bufferOutput.put(msgout);
-			} catch(InterruptedException e) {
-				System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-				e.printStackTrace();
-			}
-
-
-
+			constructMessage(Message.TYPE_NICK, Message.PKT_OK,  new String[] { nick_old + ";" + msg.getUser().getNick() }, msg.getUser());
+			
 			for (String key: global.getRoomUsers().keySet()){
 
 				ArrayList<User> users = global.getRoomUsers().get(key);
 
 				if (users.contains(msg.getUser())) {
 					for (int i = 0; i < users.size(); i++) {
-						if (users.get(i) != msg.getUser()) {
-							msgout = new Message();
-							msgout.setPacket(Message.PKT_INF);
-							msgout.setType(Message.TYPE_NICK);
-							msgout.setArgs(new String[]{ nick_old + ";" + msg.getUser().getNick()});
-							msgout.setUser(users.get(i));
-
-							try {
-
-								/* Finalmente lo escribimos en el buffer de salida */
-								this.bufferOutput.put(msgout);
-							} catch(InterruptedException e) {
-								System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-								e.printStackTrace();
-							}
-						}
+						if (users.get(i) != msg.getUser()) 
+							constructMessage(Message.TYPE_NICK, Message.PKT_INF, new String[] {  nick_old + ";" + msg.getUser().getNick()} , users.get(i));
 					}
 
 
@@ -326,7 +214,7 @@ public class Processing extends Thread{
 	}
 
 	private void processingLEAVE(Message msg) {
-		Message msgout = null;
+		
 		String room = msg.getArgs()[0];
 		
 		if(global.IsRoom(room)){
@@ -337,61 +225,29 @@ public class Processing extends Thread{
 
 				for (int i = 0; i < users.size(); i++) {
 					
-					 msgout = new Message();
-					
 					if (users.get(i).getNick() == (msg.getUser().getNick())) {
 					
-						msgout.setPacket(Message.PKT_OK);
+						constructMessage(Message.TYPE_LEAVE, Message.PKT_OK,  new String[] { msg.getUser().getNick() + ";" + room }, users.get(i));
 					}
 					else{
-						msgout.setPacket(Message.PKT_INF);
+						constructMessage(Message.TYPE_LEAVE, Message.PKT_INF, new String[] { msg.getUser().getNick() + ";" + room }, users.get(i));
 					}
-
-					msgout.setType(Message.TYPE_LEAVE);
-					msgout.setArgs(new String[]{ msg.getUser().getNick() + ";" + room });
-					msgout.setUser(users.get(i));
-					
-					try {
-
-						/* Finalmente lo escribimos en el buffer de salida */
-						this.bufferOutput.put(msgout);
-					} catch(InterruptedException e) {
-						System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-						e.printStackTrace();
-					}
-
 
 				}
 				
 				global.removeUsertoRoom(msg.getUser(), room);
 				
 			}
-			else{
-				 msgout = new Message();
-				 msgout.setPacket(Message.PKT_ERR);
-				 msgout.setType(Message.TYPE_LEAVE);
-				 msgout.setArgs(new String[]{ "ERROR: Actualmente no esta en esta sala, por lo que no puedes salir de ella" });
-				 msgout.setUser(msg.getUser());
-				 try {
-
-						/* Finalmente lo escribimos en el buffer de salida */
-						this.bufferOutput.put(msgout);
-					} catch(InterruptedException e) {
-						System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-						e.printStackTrace();
-					}
-			
-			}
-			
-			
-			
-			
+			else
+				constructMessage(Message.TYPE_LEAVE, Message.PKT_ERR,  new String[] { "ERROR: Actualmente no esta en esta sala, por lo que no puedes salir de ella" } , msg.getUser());
+				
 		}
 	}
 
 	private void processingJOIN(Message msg) {
 
 		String room = null;
+		int j = 0;
 
 		try {
 			room = msg.getArgs()[0];
@@ -401,18 +257,9 @@ public class Processing extends Thread{
 		}
 
 		if (global.userInRoom(msg.getUser(), room)) {
-			msg.setType(Message.TYPE_JOIN);
-			msg.setPacket(Message.PKT_ERR);
-			msg.setArgs(new String[]{"ERROR: El usuario ya se encuentra en esta sala"});
-			msg.setUser(msg.getUser());
-			try {
-
-				/* Finalmente lo escribimos en el buffer de salida */
-				this.bufferOutput.put(msg);
-			} catch(InterruptedException e) {
-				System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-				e.printStackTrace();
-			}
+			
+			constructMessage(Message.TYPE_JOIN, Message.PKT_ERR, new String[] {  "ERROR: El usuario ya se encuentra en esta sala" } , msg.getUser());
+			
 		}
 
 		else{
@@ -422,32 +269,20 @@ public class Processing extends Thread{
 
 			for (int i = 0; i < users.size(); i++) {
 				
-				Message msgout = new Message();
-				
-				if (users.get(i).getNick() == (msg.getUser().getNick())) {
-				
-					msgout.setPacket(Message.PKT_OK);
-				}
-				else{
-					msgout.setPacket(Message.PKT_INF);
-				}
-
-				msgout.setType(Message.TYPE_JOIN);
-				msgout.setArgs(new String[]{ msg.getUser().getNick() + ";" + room });
-				msgout.setUser(users.get(i));
-
-				try {
-
-					/* Finalmente lo escribimos en el buffer de salida */
-					this.bufferOutput.put(msgout);
-				} catch(InterruptedException e) {
-					System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-					e.printStackTrace();
-				}
-
-
-
-
+				if (users.get(i).getNick() == (msg.getUser().getNick())){ 
+					constructMessage(Message.TYPE_JOIN, Message.PKT_OK, new String[] {  msg.getUser().getNick() + ";" + room } , users.get(i));
+					// Construccion de los datos del arbol
+	               
+	                DefaultMutableTreeNode root1 = new DefaultMutableTreeNode(room);
+	                Panel.modelo.insertNodeInto(root1, Panel.main, j);
+	                DefaultMutableTreeNode subroot1 = new DefaultMutableTreeNode(msg.getUser().getNick());
+	                Panel.modelo.insertNodeInto(subroot1, root1, j);
+	                i++;
+					}
+					
+				else
+					constructMessage(Message.TYPE_JOIN, Message.PKT_INF,  new String[] { msg.getUser().getNick() + ";" + room } , users.get(i));
+					
 			}
 
 		}
@@ -467,23 +302,30 @@ public class Processing extends Thread{
 				ArrayList<User> salas = global.getRoomUsers().get(key); /* Obtenemos todos los usuarios de esa sala */
 			
 						for (int i = 0; i < salas.size(); i++) { /* Para cada uno le generamos un mensaje a medida */
-							Message msgout = new Message();
-							msgout.setType(Message.TYPE_MSG);
-							msgout.setPacket(Message.PKT_INF);
-							msgout.setArgs(new String[]{ msg.getUser().getNick() + ";" + args[0] + ";" + args[1] });
-							msgout.setUser(salas.get(i));
-
-							try {
-								
-								/* Finalmente lo escribimos en el buffer de salida */
-								this.bufferOutput.put(msgout);
-							} catch(InterruptedException e) {
-								System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
-								e.printStackTrace();
-							}
-						}
+							constructMessage(Message.TYPE_MSG, Message.PKT_INF, new String[] { msg.getUser().getNick() + ";" + args[0] + ";" + args[1] }, salas.get(i));
+							
+									}
 			}	
 						
+		}
+	}
+	
+	private void constructMessage(Byte type, Byte pkt, String[] args, User user){
+		
+		
+		Message msg = new Message();
+		msg.setType(type);
+		msg.setPacket(pkt);
+		msg.setArgs(args);
+		msg.setUser(user);
+
+		try {
+			
+			/* Finalmente lo escribimos en el buffer de salida */
+			this.bufferOutput.put(msg);
+		} catch(InterruptedException e) {
+			System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
+			e.printStackTrace();
 		}
 	}
 
