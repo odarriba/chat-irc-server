@@ -9,8 +9,8 @@ import java.util.HashMap;
 public class GlobalObject {
 	private Boolean running;
 	private Boolean debug;
-	HashMap<String,User> nickUsers;
-	HashMap<String,User[]> roomUsers;
+	private HashMap<String,User> nickUsers;
+		private HashMap<String,User[]> roomUsers;
 	private BufferMessages bufferInput;
 	private BufferMessages bufferOutput;
 	
@@ -135,6 +135,22 @@ public class GlobalObject {
 
 	public void setBufferOutput(BufferMessages bufferOutput) {
 		this.bufferOutput = bufferOutput;
+	}
+	
+	public HashMap<String, User> getNickUsers() {
+		return nickUsers;
+	}
+
+	public void setNickUsers(HashMap<String, User> nickUsers) {
+		this.nickUsers = nickUsers;
+	}
+
+	public HashMap<String, User[]> getRoomUsers() {
+		return roomUsers;
+	}
+
+	public void setRoomUsers(HashMap<String, User[]> roomUsers) {
+		this.roomUsers = roomUsers;
 	}
 	
 }

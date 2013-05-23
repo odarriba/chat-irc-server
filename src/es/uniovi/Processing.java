@@ -18,7 +18,6 @@ public class Processing extends Thread{
 	
 	Semaphore leer;
 	Semaphore escribir;
-	private Boolean threadRunning;
 	static Message msg;
 	String [] args;
 	String cadena;
@@ -41,7 +40,7 @@ public class Processing extends Thread{
 
 		Message msg=null;
 
-		while(this.global.isRunning()) {
+		while(true) {
 
 			//Se lee el buffer
 			try {
@@ -116,7 +115,6 @@ public class Processing extends Thread{
 		msg.setPacket(Message.PKT_OK);
 		msg.setArgs(new String[]{msg.getUser().getNick()});
 		msg.setUser(msg.getUser());
-		threadRunning = false;
 		
 		/* Finalmente lo escribimos en el buffer de salida */
 		try {
@@ -125,7 +123,6 @@ public class Processing extends Thread{
 			System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+ msg.getUser().getCompleteInfo());
 			e.printStackTrace();
 		}
-		threadRunning = false;
 		
 	}
 
@@ -138,9 +135,9 @@ public class Processing extends Thread{
 	private void processingWHO(Message msg) {
 		args = msg.getArgs(); /* Obtenemos los parametros del objeto mensaje, al ser de tipo WHO solo sera 1 y esta contendra el nombre de la sala */
 		
-		if (global.roomUsers.containsKey(args[0])) { /* Comprobamos que exista alguna sala con ese nombre */
+		if (global.getRoomUsers().containsKey(args[0])) { /* Comprobamos que exista alguna sala con ese nombre */
 			
-			User [] users = global.roomUsers.get(args[0]); /* Si existe recogemos todos los usuarios de la sala y concatenamos sus nicks */
+			User [] users = global.getRoomUsers().get(args[0]); /* Si existe recogemos todos los usuarios de la sala y concatenamos sus nicks */
 			
 			for (int i = 0; i < users.length; i++) {
 				
@@ -202,7 +199,7 @@ public class Processing extends Thread{
 		
 		args = msg.getArgs(); /* Obtenemos los parametros del objeto mensaje, al ser de tipo NICK solo sera 1 y esta contendra el nuevo nick */
 		
-		if (global.nickUsers.containsKey(args[0])) {
+		if (global.getNickUsers().containsKey(args[0])) {
 			
 			// Comprobamos si el nick ya esta en uso y si es asi se crear el mensaje de error
 			
@@ -221,9 +218,9 @@ public class Processing extends Thread{
 			
 			/* Ya solo quedaria por una parte avisar a todos los participantes, comando INFO,  que compartan sala con el usuario */
 			
-			for (String key: global.roomUsers.keySet()){
+			for (String key: global.getRoomUsers().keySet()){
 				
-				User[] users = global.roomUsers.get(key);
+				User[] users = global.getRoomUsers().get(key);
 				
 					for (int i = 0; i < users.length; i++) {
 						
