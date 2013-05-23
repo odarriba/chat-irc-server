@@ -9,8 +9,8 @@ import java.util.HashMap;
 public class GlobalObject {
 	private Boolean running;
 	private Boolean debug;
-	private HashMap<String,User> nickUsers;
-	private HashMap<String,User[]> roomUsers;
+	HashMap<String,User> nickUsers;
+	HashMap<String,User[]> roomUsers;
 	private BufferMessages bufferInput;
 	private BufferMessages bufferOutput;
 	

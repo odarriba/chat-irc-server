@@ -18,6 +18,7 @@ public class Main extends Thread {
 	 * @param debug Boolean indicando si se activa el modo debug
 	 */
 	public Main(Integer port, Boolean debug) {
+		
 		this.port = port;
 		this.debug = debug;
 		this.global = new GlobalObject();
