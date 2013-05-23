@@ -11,6 +11,8 @@ public class GlobalObject {
 	private Boolean debug;
 	private HashMap<String,User> nickUsers;
 	private HashMap<String,User[]> roomUsers;
+	private BufferMessages bufferInput;
+	private BufferMessages bufferOutput;
 	
 	private static final String version = "0.1";
 	private static final String compilationDate = "2013-29-04";
@@ -19,6 +21,8 @@ public class GlobalObject {
 		this.running = true;
 		this.nickUsers = new HashMap<String,User>();
 		this.roomUsers = new HashMap<String,User[]>();
+		this.bufferInput = new BufferMessages();
+		this.bufferOutput = new BufferMessages();
 	}
 
 	/**
@@ -55,7 +59,7 @@ public class GlobalObject {
 
 	/**
 	 * Obtiene el estado de activacion del modo debug
-	 * @return Boolean indicando si el modo debug est‡ activo o no
+	 * @return Boolean indicando si el modo debug estï¿½ activo o no
 	 */
 	public Boolean getDebug() {
 		return debug;
@@ -74,8 +78,8 @@ public class GlobalObject {
 	 */
 	
 	/**
-	 * A–ade un usuario al objeto compartido de usuarios
-	 * @param user Usuario a a–adir
+	 * Aï¿½ade un usuario al objeto compartido de usuarios
+	 * @param user Usuario a aï¿½adir
 	 */
 	public synchronized void addUser(User user) {
 		nickUsers.put(user.getNick(), user);
@@ -112,4 +116,25 @@ public class GlobalObject {
 	public User getUserByNick(String nick) {
 		return nickUsers.get(nick);
 	}
+	
+	/**
+	 * Obtener el buffer de entrada de datos
+	 * @return bufferInput
+	 */
+	public BufferMessages getBufferInput() {
+		return bufferInput;
+	}
+	
+	/**
+	 * Obtener el buffer de salida de datos
+	 * @return bufferOutput
+	 */
+	public BufferMessages getBufferOutput() {
+		return bufferOutput;
+	}
+
+	public void setBufferOutput(BufferMessages bufferOutput) {
+		this.bufferOutput = bufferOutput;
+	}
+	
 }

@@ -1,16 +1,15 @@
 package es.uniovi;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.io.IOException;
 
 public class Main extends Thread {
 	public Integer port;
 	public Boolean debug;
 	private GlobalObject global;
 	private ServerSocket socketPrincipal;
-	private BufferMessages bufferInput;
-	private BufferMessages bufferOutput;
 	private NetworkOut netOut;
+	private Processing process;
 	
 	/**
 	 * Constructor de la clase Main, donde se crearan todos los objetos necesarios para arrancar el servidor.
@@ -26,10 +25,9 @@ public class Main extends Thread {
 		this.global.setDebug(this.debug);
 		
 		// Arrancar los hilos necesarios
-		this.bufferInput = new BufferMessages();
-		this.bufferOutput = new BufferMessages();
 		
-		this.netOut = new NetworkOut(this.bufferOutput, this.global);
+		this.netOut = new NetworkOut(this.global);
+		this.process = new Processing(this.global);
 		// TODO: Aqui se crearian los objetos de los hilos de procesamiento
 	}
 	
@@ -59,8 +57,9 @@ public class Main extends Thread {
 			return;
 		}
 		
-		// Arrancar los diferentes hilos iniciales de la aplicaci—n
+		// Arrancar los diferentes hilos iniciales de la aplicaciï¿½n
 		this.netOut.start();
+		this.process.start();
 		// TODO: Aqui se arrancarian los hilos de procesamiento necesarios
 		
 		while(this.global.isRunning()) {
@@ -69,11 +68,11 @@ public class Main extends Thread {
 				usersAccepted++;
 				
 				// Crear el usuario y registrarlo
-				User user = new User("An—nimo"+usersAccepted, socketAccepted);
+				User user = new User("Anï¿½nimo"+usersAccepted, socketAccepted);
 				this.global.addUser(user);
 				
 				// Crear el hilo de lectura de este usuario en particular
-				netIn = new NetworkIn(user, this.global, this.bufferInput);
+				netIn = new NetworkIn(user, this.global);
 				
 				
 				System.out.println("INFO: Mensaje de bienvenida enviado a usuario "+user.getCompleteInfo());
@@ -86,7 +85,7 @@ public class Main extends Thread {
 				msgWelcome.setUser(user);
 				
 				try {
-					this.bufferOutput.put(msgWelcome);
+					global.getBufferOutput().put(msgWelcome);
 				} catch(InterruptedException e) {
 					System.err.println("ERROR: Error al enviar el mensaje de bienvenida a "+user.getCompleteInfo());
 					e.printStackTrace();
@@ -117,9 +116,9 @@ public class Main extends Thread {
 		// Leer el puerto de red
 		port = new Integer(args[0]);
 		
-		// Comprobar que el puerto estŽ entre los valores admitidos
+		// Comprobar que el puerto estï¿½ entre los valores admitidos
 		if (port < 1 || port > 65535) {
-			System.err.println("Error: el nœmero de puerto debe est‡r comprendido entre 0 y 65535");
+			System.err.println("Error: el nï¿½mero de puerto debe estï¿½r comprendido entre 0 y 65535");
 			return;
 		}
 		

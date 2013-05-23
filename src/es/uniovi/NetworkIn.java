@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  * Clase para escuchar a cada socket de usuario de forma independiente y convertir sus mensajes
- * al formato interno para poder a–adirlos al buffer de entrada.
+ * al formato interno para poder aï¿½adirlos al buffer de entrada.
  */
 public class NetworkIn extends Thread {
 	private User user;
@@ -21,11 +21,11 @@ public class NetworkIn extends Thread {
 	 * @param global Variable global comun
 	 * @param bufferInput Buffer de mensajes de entrada
 	 */
-	public NetworkIn(User user, GlobalObject global, BufferMessages bufferInput) {
+	public NetworkIn(User user, GlobalObject global) {
 		// Asignar las variables de la clase
 		this.user = user;
 		this.global = global;
-		this.bufferInput = bufferInput;
+		this.bufferInput = global.getBufferInput();
 		this.threadRunning = true;
 		
 		// Intentar obtener el socket y el InputStream
@@ -100,9 +100,9 @@ public class NetworkIn extends Thread {
 	
 	private Message readMessage() throws IOException {
 		Message msg;		// El objeto a crear
-		short sizeLoad;		// Tama–o de la carga
+		short sizeLoad;		// Tamaï¿½o de la carga
 		short numArgs;		// Numero de argumentos
-		short sizeArg;		// Tama–o de cada argumento cuando se trate
+		short sizeArg;		// Tamaï¿½o de cada argumento cuando se trate
 		byte[] argBytes;	// Array de los bytes de cada argumento
 		String[] args;		// Array de los argumentos ya convertidos
 		
@@ -139,7 +139,7 @@ public class NetworkIn extends Thread {
 			args = new String[0];
 		}
 		
-		// Almacenar argumentos y a–adir el usuario
+		// Almacenar argumentos y aï¿½adir el usuario
 		msg.setArgs(args);
 		msg.setUser(this.user);
 		

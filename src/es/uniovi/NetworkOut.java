@@ -16,9 +16,9 @@ public class NetworkOut extends Thread {
 	 * @param bufferOutput Buffer de mensajes de salida
 	 * @param global Variable GlobalObject con las variables globales
 	 */
-	public NetworkOut(BufferMessages bufferOutput, GlobalObject global) {
+	public NetworkOut(GlobalObject global) {
 		this.global = global;
-		this.bufferOutput = bufferOutput;
+		this.bufferOutput = global.getBufferOutput();
 	}
 	
 	/**
@@ -39,13 +39,13 @@ public class NetworkOut extends Thread {
 				e.printStackTrace();
 			}
 			
-			// Comprobar que el mensaje es v‡lido y enviarlo.
+			// Comprobar que el mensaje es vï¿½lido y enviarlo.
 			try {
 				if (outputMsg.isValid()) {
 					sendMessage(outputMsg);
 				}
 				else {
-					System.err.println("ERROR: El mensaje saliente no es v‡lido.");
+					System.err.println("ERROR: El mensaje saliente no es vï¿½lido.");
 					outputMsg.showInfo();
 				}
 			} catch(IOException e){
@@ -63,7 +63,7 @@ public class NetworkOut extends Thread {
 	 */
 	private void sendMessage(Message msg) throws IOException {
 		DataOutputStream output;// Stream de salida del socket
-		short sizeLoad = 0;		// Tama–o de la carga
+		short sizeLoad = 0;		// Tamaï¿½o de la carga
 		short numArgs = 0;		// Numero de argumentos del mensaje
 		byte[][] argsBytes;		// Array con los argumentos en formato binario
 		String[] args;			// Array con los argumentos en formato texto
