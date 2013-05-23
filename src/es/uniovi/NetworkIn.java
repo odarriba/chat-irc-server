@@ -14,8 +14,7 @@ public class NetworkIn extends Thread {
 	private Socket socket;
 	private GlobalObject global;
 	private Boolean threadRunning;	// Varibale para asegurar que el hilo se cierrfe independientemente cuando sea necesario
-	Semaphore leer;
-	Semaphore escribir;
+
 	
 	/**
 	 * Constructor de la clase NetworkIn que se autolanza
@@ -23,14 +22,11 @@ public class NetworkIn extends Thread {
 	 * @param global Variable global comun
 	 * @param bufferInput Buffer de mensajes de entrada
 	 */
-	public NetworkIn(User user, GlobalObject global, Semaphore leer, Semaphore escribir) {
+	public NetworkIn(User user, GlobalObject global) {
 		// Asignar las variables de la clase
 		this.user = user;
 		this.global = global;
 		this.threadRunning = true;
-		this.leer = leer;
-		this.escribir = escribir;
-		
 		
 		
 		// Intentar obtener el socket y el InputStream
@@ -80,9 +76,7 @@ public class NetworkIn extends Thread {
 				
 				try {
 					// Introducirlo en el buffer de entrada
-					escribir.acquire();
 					global.getBufferInput().put(msg);
-					leer.release();
 				} catch (InterruptedException e) {
 					System.err.println("ERROR: Error al introducir el mensaje: ");
 					msg.showInfo(); // Mostrar la info del error
