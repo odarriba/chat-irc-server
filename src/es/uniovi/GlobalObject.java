@@ -154,9 +154,11 @@ public class GlobalObject {
 	
 	public synchronized void deleteUser(User user) {
 		for (String key: roomUsers.keySet()){ /* Recorremos todas las salas */
-			roomUsers.get(key).remove(user);
-			if(emptyRoom(key)) {
-				roomUsers.remove(key);
+			if(roomUsers.get(key).contains(user)){/*Comprobamos que el usuario este en la sala */
+				roomUsers.get(key).remove(user);
+				if(emptyRoom(key)) {
+					roomUsers.remove(key);
+				}
 			}
 		}
 		
