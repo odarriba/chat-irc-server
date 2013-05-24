@@ -2,14 +2,17 @@ package es.uniovi;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.io.IOException;
 import java.util.HashMap;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.WindowConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 
 
@@ -28,19 +31,40 @@ public class Panel
      * Ejemplo sencillo de uso de JTree
      *
      * @param args Argumentos de linea de comandos. Se ignoran.
+     * @wbp.parser.entryPoint
      */
     public  void build()
     {
         // Construccion del arbol
     	roomNodes=new HashMap<String, RoomNode>();
         main = new DefaultMutableTreeNode("Salas");
-        modelo= new DefaultTreeModel(main);
+        modelo = new DefaultTreeModel(main);
         JTree tree = new JTree(modelo);
-
+        //Comprobamos de donde se esta compilando
+        String path = null;
+        try {
+			path = new java.io.File(".").getCanonicalPath();//obtenemos el path actual
+		} catch (IOException e) {
+			System.err.println("Error al obtener el path actual");
+			e.printStackTrace();
+		}
+        //Si estamos dentro de src
+        if(path.endsWith("src"))
+        	path="./";
+        //Si no estamos dentro de src
+        else
+        	path="./src/";
+        
+        DefaultTreeCellRenderer render = new DefaultTreeCellRenderer();
+        render.setLeafIcon(new ImageIcon(path+"images/user.png"));
+        render.setOpenIcon(new ImageIcon(path+"images/room.png"));
+        render.setClosedIcon(new ImageIcon(path+"images/room.png"));
+        tree.setCellRenderer(render);
         // Construccion y visualizacion de la ventana
         JFrame v = new JFrame();
+        v.getContentPane().setLayout(new BorderLayout(0, 0));
         JScrollPane scroll = new JScrollPane(tree);
-        v.getContentPane().add(scroll, BorderLayout.NORTH);
+        v.getContentPane().add(scroll, BorderLayout.CENTER);
         
         v.setSize(new Dimension(250, 600));
         v.setVisible(true);

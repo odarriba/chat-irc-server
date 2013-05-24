@@ -6,6 +6,7 @@ import java.net.Socket;
 public class Main extends Thread {
 	public Integer port;
 	public Boolean debug;
+	public boolean panel;
 	private GlobalObject global;
 	private ServerSocket socketPrincipal;
 	private NetworkOut netOut;
@@ -17,14 +18,15 @@ public class Main extends Thread {
 	 * @param port Puerto de la aplicacion
 	 * @param debug Boolean indicando si se activa el modo debug
 	 */
-	public Main(Integer port, Boolean debug) {
+	public Main(Integer port, Boolean debug,Boolean panel) {
 		
 		this.port = port;
 		this.debug = debug;
 		this.global = new GlobalObject();
 		
 		this.global.setDebug(this.debug);
-		
+		//por defecto no tenemos interfaz
+		this.panel=panel;
 		// Arrancar los hilos necesarios
 		
 		this.netOut = new NetworkOut(this.global);
@@ -62,7 +64,9 @@ public class Main extends Thread {
 		// Arrancar los diferentes hilos iniciales de la aplicaci�n
 		this.netOut.start();
 		this.process.start();
-		global.getPanel().build();
+		//solo arracamos la interfaz si se nos indica
+		if(panel)
+			global.getPanel().build();
 		// TODO: Aqui se arrancarian los hilos de procesamiento necesarios
 		
 		while(this.global.isRunning()) {
@@ -107,11 +111,12 @@ public class Main extends Thread {
 	public static void main(String[] args) {
 		Integer port;
 		Boolean debug = false;
+		Boolean panel=false;
 		Main main;
 		
 		// Si no hay los suficientes parametros o si se solicita la ayuda, mostrar el mensaje.
 		if (args.length < 1 || args[0].equals("-h") || args[0].equals("--help")) {
-			System.err.println("Uso: ServidorChatIRC <puerto> [-d | --debug]");
+			System.err.println("Uso: ServidorChatIRC <puerto> [-d | --debug] [-p | --panel]");
 			return;
 		}
 		
@@ -124,13 +129,18 @@ public class Main extends Thread {
 			return;
 		}
 		
-		// Si se ha solicitado el modo debug, activar el flag
-		if (args.length > 1 && (args[1].equals("-d") || args[1].equals("--debug"))) {
-			debug = true;
+		// Si se ha solicitado el modo debug o panel, activar el flag
+		if (args.length > 1) {
+			for(int i=1;i<args.length;i++){
+				if((args[i].equals("-d") || args[i].equals("--debug")))
+					debug = true;
+				else if((args[i].equals("-p") || args[i].equals("--panel")))
+					panel = true;
+			}
 		}
 		
 		// Inicializar el hilo Main
-		main = new Main(port, debug);
+		main = new Main(port, debug, panel);
 		main.start();
 		
 		return;
