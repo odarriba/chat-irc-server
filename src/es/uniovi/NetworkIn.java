@@ -60,10 +60,15 @@ public class NetworkIn extends Thread {
 					// Se ha cerrado el socket, borrar los datos del usuario y cancelar la ejecucion de este hilo
 					System.out.println("INFO: Se ha detectado un error que ha provocado la desconexion brusca de "+this.user.getCompleteInfo()+". Se dispone a eliminarlo del sistema.");
 					this.global.deleteUser(this.user);
-						
-					// Cerrar el listener
-					this.threadRunning = false;
 				}
+				
+				/* En cualquier caso, este conectado (y se ha desconectado) o no, hay que cerrar el hilo de red.*/
+				
+				// Cerrar el listener
+				this.threadRunning = false;
+				
+				// Salir del hilo
+				return;
 			}
 			
 			// Comprobar que el mensaje leido este completo y sea valido

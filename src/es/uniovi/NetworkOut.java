@@ -42,6 +42,10 @@ public class NetworkOut extends Thread {
 			// Comprobar que el mensaje es v�lido y enviarlo.
 			try {
 				if (outputMsg.isValid()) {
+					if (this.global.getDebug()) {
+						System.out.println("DEBUG: Traza del mensaje enviado a "+outputMsg.getUser().getCompleteInfo()+" :");
+						outputMsg.showInfo();
+					}
 					sendMessage(outputMsg);
 				}
 				else {

@@ -161,6 +161,8 @@ public class GlobalObject {
 		}
 		
 		nickUsers.remove(user.getNick());
+		
+		user.setConnected(false);
 	}
 	
 	public synchronized boolean userInRoom(User user, String room){
