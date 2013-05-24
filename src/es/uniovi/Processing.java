@@ -56,6 +56,12 @@ public class Processing extends Thread{
 	
 	private void typeProcessing(Message msg) {
 		if (msg.isValid()) {
+			// Si no se env’a comando, error
+			if (msg.getPacket() != Message.PKT_CMD) {
+				processingUNKNOW(msg);
+				return;
+			}
+			
 			switch(msg.getType()) {
 				case Message.TYPE_MSG:
 					processingMSG(msg);
