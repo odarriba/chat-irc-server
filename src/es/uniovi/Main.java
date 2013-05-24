@@ -34,8 +34,7 @@ public class Main extends Thread {
 	}
 	
 	public void run() {
-		Panel p = new Panel();
-        p.build();
+
 		Socket socketAccepted;
 		
 		Message msgWelcome;
@@ -64,6 +63,7 @@ public class Main extends Thread {
 		// Arrancar los diferentes hilos iniciales de la aplicaci�n
 		this.netOut.start();
 		this.process.start();
+		global.getPanel().build();
 		// TODO: Aqui se arrancarian los hilos de procesamiento necesarios
 		
 		while(this.global.isRunning()) {

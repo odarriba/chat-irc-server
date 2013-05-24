@@ -15,6 +15,7 @@ public class GlobalObject {
 	private HashMap<String,ArrayList<User> > roomUsers;
 	private BufferMessages bufferInput;
 	private BufferMessages bufferOutput;
+	private Panel panel;
 	
 	private static final String version = "0.1";
 	private static final String compilationDate = "2013-29-04";
@@ -25,6 +26,7 @@ public class GlobalObject {
 		this.roomUsers = new HashMap<String,ArrayList<User> >();
 		this.bufferInput = new BufferMessages();
 		this.bufferOutput = new BufferMessages();
+		this.panel = new Panel();
 	}
 
 	/**
@@ -269,4 +271,11 @@ public class GlobalObject {
 		this.roomUsers = roomUsers;
 	}
 	
+	/**
+	 * 
+	 * @return Nos devuelve el panel de representacion
+	 */
+	public synchronized Panel getPanel(){
+		return panel;
+	}
 }

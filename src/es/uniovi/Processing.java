@@ -119,6 +119,11 @@ public class Processing extends Thread{
 		
 		global.deleteUser(msg.getUser());
 		
+		//eliminamos al usuario del arbol
+		global.getPanel().delUser(msg.getUser().getNick());
+		
+		
+		
 	}
 
 	/**
@@ -191,17 +196,25 @@ public class Processing extends Thread{
 			/* Ya solo quedaria por una parte avisar a todos los participantes, comando INFO,  que compartan sala con el usuario */
 
 			constructMessage(Message.TYPE_NICK, Message.PKT_OK,  new String[] { nick_old + ";" + msg.getUser().getNick() }, msg.getUser());
+			//Eliminamos al usuario de todas las salas del arbol
+			global.getPanel().delUser(nick_old);
 			
 			for (String key: global.getRoomUsers().keySet()){
 
 				ArrayList<User> users = global.getRoomUsers().get(key);
 
 				if (users.contains(msg.getUser())) {
+					
 					for (int i = 0; i < users.size(); i++) {
 						if (users.get(i) != msg.getUser()) 
 							constructMessage(Message.TYPE_NICK, Message.PKT_INF, new String[] {  nick_old + ";" + msg.getUser().getNick()} , users.get(i));
 					}
-
+					//Volvemos a introducir al usuario en el arbol con el
+					//nuevo nick
+					if(!global.getPanel().isRoom(key))
+						//si no existe la creamos
+						global.getPanel().newRoom(key);
+					global.getPanel().newUser(key, msg.getUser().getNick());
 
 				}
 
@@ -237,6 +250,9 @@ public class Processing extends Thread{
 				
 				global.removeUsertoRoom(msg.getUser(), room);
 				
+				//Lo sacamos de la sala en el arbol
+				global.getPanel().delUser(room, msg.getUser().getNick());
+				
 			}
 			else
 				constructMessage(Message.TYPE_LEAVE, Message.PKT_ERR,  new String[] { "ERROR: Actualmente no esta en esta sala, por lo que no puedes salir de ella" } , msg.getUser());
@@ -264,6 +280,13 @@ public class Processing extends Thread{
 
 		else{
 			global.addUsertoRoom(msg.getUser(), room);
+			//introducimos al usuario en el arbol 
+			//primero comprobamos si existe la sala
+			if(!global.getPanel().isRoom(room))
+				//si no existe la creamos
+				global.getPanel().newRoom(room);
+			global.getPanel().newUser(room, msg.getUser().getNick());
+			
 	
 			ArrayList<User> users = global.getRoomUsers().get(room);
 
@@ -271,12 +294,7 @@ public class Processing extends Thread{
 				
 				if (users.get(i).getNick() == (msg.getUser().getNick())){ 
 					constructMessage(Message.TYPE_JOIN, Message.PKT_OK, new String[] {  msg.getUser().getNick() + ";" + room } , users.get(i));
-					// Construccion de los datos del arbol
-	               
-	                DefaultMutableTreeNode root1 = new DefaultMutableTreeNode(room);
-	                Panel.modelo.insertNodeInto(root1, Panel.main, j);
-	                DefaultMutableTreeNode subroot1 = new DefaultMutableTreeNode(msg.getUser().getNick());
-	                Panel.modelo.insertNodeInto(subroot1, root1, j);
+					
 	                i++;
 					}
 					
