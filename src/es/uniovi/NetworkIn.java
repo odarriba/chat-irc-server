@@ -55,11 +55,12 @@ public class NetworkIn extends Thread {
 			try {
 				msg = readMessage();
 			} catch (IOException e) {
-				if (this.socket.isClosed() || this.socket.isConnected() == false) {
+				// Mostrar el error y finalizar conexion cuando el usuario este conectado y ocurra error.
+				if (this.user.getConnected()){
 					// Se ha cerrado el socket, borrar los datos del usuario y cancelar la ejecucion de este hilo
-					System.out.println("INFO: Se ha detectado la desconexion brusca de "+this.user.getCompleteInfo()+". Se dispone a eliminarlo del sistema.");
+					System.out.println("INFO: Se ha detectado un error que ha provocado la desconexion brusca de "+this.user.getCompleteInfo()+". Se dispone a eliminarlo del sistema.");
 					this.global.deleteUser(this.user);
-					
+						
 					// Cerrar el listener
 					this.threadRunning = false;
 				}

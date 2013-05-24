@@ -139,11 +139,7 @@ public class Processing extends Thread{
 	}
 
 	private void processingLIST(Message msg) {
-		if (global.noRooms()) {
-			constructMessage(Message.TYPE_LIST, Message.PKT_ERR, new String[]{" ERROR: No hay salas abiertas" }, msg.getUser());
-		} else {
-			constructMessage(Message.TYPE_LIST, Message.PKT_OK, global.listRooms() , msg.getUser());
-		}
+		constructMessage(Message.TYPE_LIST, Message.PKT_OK, global.listRooms() , msg.getUser());
 	}
 
 	/**
@@ -163,6 +159,9 @@ public class Processing extends Thread{
 		} else {
 			/* En caso contrario hacer la notificacionespara proceder al cambio de nick */
 			String nick_old = msg.getUser().getNick();
+			
+			// Hacer primero el cambio de nick en las variables globales
+			global.modifyUserNick(msg.getUser(), args[0]);
 			
 			// Informar al propio usuario de que se le ha cambiado el nombre
 			constructMessage(Message.TYPE_NICK, Message.PKT_OK,  new String[] { nick_old, msg.getUser().getNick() }, msg.getUser());
@@ -191,9 +190,6 @@ public class Processing extends Thread{
 					global.getPanel().newUser(key, msg.getUser().getNick());
 				}
 			}
-			
-			// Hacer el cambio de nick en las variables globales
-			global.modifyUserNick(msg.getUser(), args[0]);
 		}
 	}
 

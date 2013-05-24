@@ -45,12 +45,18 @@ public class NetworkOut extends Thread {
 					sendMessage(outputMsg);
 				}
 				else {
-					System.err.println("ERROR: El mensaje saliente no es vï¿½lido.");
+					System.err.println("ERROR: El mensaje saliente no es valido.");
 					outputMsg.showInfo();
 				}
 			} catch(IOException e){
-				System.err.println("ERROR: Error al enviar el mensaje saliente a la red.");
-				e.printStackTrace();
+				// Si ocurre un error de E/S con un usuario conectado, repotar y desconectarlo.
+				if (outputMsg.getUser().getConnected()) {
+					System.err.println("ERROR: Error al enviar el mensaje saliente a la red hacia el usuario "+outputMsg.getUser().getCompleteInfo()+".");
+					e.printStackTrace();
+					System.out.println("INFO: Se procede a la eliminaci—n del usuario "+outputMsg.getUser().getCompleteInfo());
+					
+					this.global.deleteUser(outputMsg.getUser());
+				}
 			}
 		}
 	}

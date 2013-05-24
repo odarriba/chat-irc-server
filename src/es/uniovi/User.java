@@ -4,6 +4,7 @@ import java.net.Socket;
 public class User {
 	private Socket socket;
 	private String nick;
+	private Boolean connected;
 	
 	/**
 	 * Constructor para crear un usuario conectado
@@ -13,6 +14,23 @@ public class User {
 	public User(String nick, Socket socket) {
 		this.nick = nick;
 		this.socket = socket;
+		this.connected = true;
+	}
+	
+	/**
+	 * Cambiar el estado de conexion del usuario
+	 * @param state Estado de conexion del usuario
+	 */
+	public void setConnected(Boolean state) {
+		this.connected = state;
+	}
+	
+	/**
+	 * Obtener el estado de conexion de un usuario
+	 * @return Estado de conexion
+	 */
+	public Boolean getConnected() {
+		return connected;
 	}
 	
 	/**

@@ -123,17 +123,17 @@ public class GlobalObject {
 	 * @return
 	 */
 	
-	public synchronized String[] listRooms(){
-		
+	public synchronized String[] listRooms() {
 		String[] chain = new String[1];
 		chain[0] = "";
 		
-		
-		for (String key: roomUsers.keySet()){
-			
+		for (String key: roomUsers.keySet()) {
 			chain[0] += key + ";";
 		}
-		chain[0].substring(0, chain[0].length() - 1);
+		
+		if (chain[0].length() > 0) {
+			chain[0].substring(0, chain[0].length() - 1);
+		}
 		
 		return chain;
 	}
@@ -143,10 +143,8 @@ public class GlobalObject {
 	 * @return True cuando no hay salas existen salas
 	 */
 	
-	public synchronized boolean noRooms(){
-		
+	public synchronized boolean noRooms() {
 		return roomUsers.isEmpty();
-		
 	}
 	
 	/**
@@ -155,14 +153,12 @@ public class GlobalObject {
 	 */
 	
 	public synchronized void deleteUser(User user) {
-		// TODO: Abria que eliminar al usuario de las salas (y emitir los consiguientes mensajes) 
-		// antes de eliminarlo de los objetos compartidos.
 		for (String key: roomUsers.keySet()){ /* Recorremos todas las salas */
-				
-				roomUsers.get(key).remove(user);
-					if( emptyRoom(key) )
-						roomUsers.remove(key);
+			roomUsers.get(key).remove(user);
+			if(emptyRoom(key)) {
+				roomUsers.remove(key);
 			}
+		}
 		
 		nickUsers.remove(user.getNick());
 	}
