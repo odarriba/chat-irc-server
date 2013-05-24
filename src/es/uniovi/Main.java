@@ -9,7 +9,6 @@ public class Main extends Thread {
 	private GlobalObject global;
 	private ServerSocket socketPrincipal;
 	private NetworkOut netOut;
-	private NetworkIn netIn;
 	private Processing process;
 	
 	/**
@@ -76,8 +75,7 @@ public class Main extends Thread {
 				this.global.addUser(user);
 				
 				// Crear el hilo de lectura de este usuario en particular
-				netIn = new NetworkIn(user, this.global);
-				
+				new NetworkIn(user, this.global);
 				
 				System.out.println("INFO: Mensaje de bienvenida enviado a usuario "+user.getCompleteInfo());
 				
