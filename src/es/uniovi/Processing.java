@@ -56,7 +56,7 @@ public class Processing extends Thread{
 	
 	private void typeProcessing(Message msg) {
 		if (msg.isValid()) {
-			// Si no se env’a comando, error
+			// Si no se envï¿½a comando, error
 			if (msg.getPacket() != Message.PKT_CMD) {
 				processingUNKNOW(msg);
 				return;
@@ -110,7 +110,25 @@ public class Processing extends Thread{
 	 */
 	private void processingQUIT(Message msg) {
 		/* Unicamente se genera un mensaje de tipo QUIT - OK y se le envia al origen */
+		if(msg.getUser().getSocket().isConnected())
 		constructMessage(Message.TYPE_QUIT, Message.PKT_OK, new String[]{msg.getUser().getNick()}, msg.getUser());
+		
+		/* Enviamos un mensaje de tipo QUIT - INF a todos los usuarios de las salas en las que se encontraba (pero solo una vez)*/
+		ArrayList<User> users_sended = new ArrayList<User>();
+		for (String key: global.getRoomUsers().keySet()) {
+			ArrayList<User> users = global.getRoomUsers().get(key);
+
+			if (users.contains(msg.getUser())) {
+				for (int i = 0; i < users.size(); i++) {
+					if (users.get(i) != msg.getUser() && !users_sended.contains(users.get(i))){ 
+						users_sended.add(users.get(i));
+						constructMessage(Message.TYPE_QUIT, Message.PKT_INF, new String[] {msg.getUser().getNick()} , users.get(i));
+					}
+				}
+				
+			}
+		}
+		
 		
 		global.deleteUser(msg.getUser());
 		

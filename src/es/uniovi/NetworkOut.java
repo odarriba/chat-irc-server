@@ -57,9 +57,10 @@ public class NetworkOut extends Thread {
 				if (outputMsg.getUser().getConnected()) {
 					System.err.println("ERROR: Error al enviar el mensaje saliente a la red hacia el usuario "+outputMsg.getUser().getCompleteInfo()+".");
 					e.printStackTrace();
-					System.out.println("INFO: Se procede a la eliminaci—n del usuario "+outputMsg.getUser().getCompleteInfo());
+					System.out.println("INFO: Se procede a la eliminaciï¿½n del usuario "+outputMsg.getUser().getCompleteInfo());
 					
-					this.global.deleteUser(outputMsg.getUser());
+					//Se simula el envio de un QUIT
+					this.global.simulateQUIT(outputMsg.getUser());
 				}
 			}
 		}

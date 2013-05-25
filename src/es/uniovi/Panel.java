@@ -14,6 +14,9 @@ import javax.swing.WindowConstants;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import java.awt.Font;
 
 
 /**
@@ -60,9 +63,14 @@ public class Panel
         render.setOpenIcon(new ImageIcon(path+"images/room.png"));
         render.setClosedIcon(new ImageIcon(path+"images/room.png"));
         tree.setCellRenderer(render);
+        tree.setRootVisible(false);
         // Construccion y visualizacion de la ventana
         JFrame v = new JFrame();
         v.getContentPane().setLayout(new BorderLayout(0, 0));
+        
+        JLabel lblTitle = new JLabel("Salas y usuarios :");
+        lblTitle.setFont(new Font("Dialog", Font.BOLD, 20));
+        v.getContentPane().add(lblTitle, BorderLayout.NORTH);
         JScrollPane scroll = new JScrollPane(tree);
         v.getContentPane().add(scroll, BorderLayout.CENTER);
         

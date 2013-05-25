@@ -5,7 +5,7 @@ import java.io.IOException;
 
 /**
  * Clase para escuchar a cada socket de usuario de forma independiente y convertir sus mensajes
- * al formato interno para poder aÐadirlos al buffer de entrada.
+ * al formato interno para poder aï¿½adirlos al buffer de entrada.
  */
 public class NetworkIn extends Thread {
 	private User user;
@@ -59,7 +59,8 @@ public class NetworkIn extends Thread {
 				if (this.user.getConnected()){
 					// Se ha cerrado el socket, borrar los datos del usuario y cancelar la ejecucion de este hilo
 					System.out.println("INFO: Se ha detectado un error que ha provocado la desconexion brusca de "+this.user.getCompleteInfo()+". Se dispone a eliminarlo del sistema.");
-					this.global.deleteUser(this.user);
+					//Simulamos que se ha recibido un mensaje QUIT del usuario
+					global.simulateQUIT(this.user);
 				}
 				
 				/* En cualquier caso, este conectado (y se ha desconectado) o no, hay que cerrar el hilo de red.*/
@@ -106,9 +107,9 @@ public class NetworkIn extends Thread {
 	
 	private Message readMessage() throws IOException {
 		Message msg;		// El objeto a crear
-		short sizeLoad;		// TamaÐo de la carga
+		short sizeLoad;		// Tamaï¿½o de la carga
 		short numArgs;		// Numero de argumentos
-		short sizeArg;		// TamaÐo de cada argumento cuando se trate
+		short sizeArg;		// Tamaï¿½o de cada argumento cuando se trate
 		byte[] argBytes;	// Array de los bytes de cada argumento
 		String[] args;		// Array de los argumentos ya convertidos
 		
@@ -122,7 +123,7 @@ public class NetworkIn extends Thread {
 		sizeLoad = this.inputStream.readShort();
 		
 		if (sizeLoad > 0) { 
-			// Si hay carga, leer el nÌ¼mero de parÌÁmetros
+			// Si hay carga, leer el nÌ¼mero de parï¿½ï¿½metros
 			numArgs = this.inputStream.readShort();
 			args = new String[numArgs];
 			
@@ -145,7 +146,7 @@ public class NetworkIn extends Thread {
 			args = new String[0];
 		}
 		
-		// Almacenar argumentos y aÐadir el usuario
+		// Almacenar argumentos y aï¿½adir el usuario
 		msg.setArgs(args);
 		msg.setUser(this.user);
 		

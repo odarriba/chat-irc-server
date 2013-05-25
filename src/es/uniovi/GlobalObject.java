@@ -278,4 +278,21 @@ public class GlobalObject {
 	public synchronized Panel getPanel(){
 		return panel;
 	}
+	
+	/**
+	 * Introduce un mensaje del tipo QUIT en el buffer de entrada
+	 * @param user Es el usuario que ha hecho el quit
+	 */	
+	public synchronized void simulateQUIT(User user){
+		Message msg_exit=new Message();
+		msg_exit.setUser(user);
+		msg_exit.setType(Message.TYPE_QUIT);
+		msg_exit.setPacket(Message.PKT_CMD);
+		try {
+			getBufferInput().put(msg_exit);
+		} catch (InterruptedException e1) {
+			System.err.println("No se ha podido introducir el msg QUIT en el buffer");
+			e1.printStackTrace();
+		}
+	}
 }
