@@ -155,7 +155,7 @@ public class Processing extends Thread{
 			}
 			
 			/* Se genera el mensaje de respuesta a el cliente */
-			constructMessage(Message.TYPE_WHO, Message.PKT_INF, new String[]{  args[0], chain.substring(0 , chain.length() - 1) }, msg.getUser());
+			constructMessage(Message.TYPE_WHO, Message.PKT_OK, new String[]{  args[0], chain.substring(0 , chain.length() - 1) }, msg.getUser());
 		} else {
 			/* Si no es asi generamos un mensake de error */ 
 			constructMessage(Message.TYPE_WHO, Message.PKT_ERR, new String[]{" La sala solicitada no existe actualmente" }, msg.getUser());
@@ -281,16 +281,18 @@ public class Processing extends Thread{
 
 	private void processingMSG(Message msg) {
 		String [] args = msg.getArgs(); /* Obtenemos los parametros sala y mesaje */
+		ArrayList<User> users = global.getRoomUsers().get(args[0]);
 		
-		for (String key: global.getRoomUsers().keySet()) { /* Recorremos todas las salas */
-			if (key.equals(args[0])) { /* Hasta detectar la que coincide con la que nos mando el usuario */
-				ArrayList<User> salas = global.getRoomUsers().get(key); /* Obtenemos todos los usuarios de esa sala */
+			if (global.getRoomUsers().containsKey(args[0]) && users.contains(msg.getUser())) { /* Comprobamos que exista la sala y se encuentre en ella */
+				ArrayList<User> salas = global.getRoomUsers().get(args[0]); /* Obtenemos todos los usuarios de esa sala */
 				
 				for (int i = 0; i < salas.size(); i++) { /* Para cada uno le generamos un mensaje a medida */
 					constructMessage(Message.TYPE_MSG, Message.PKT_INF, new String[] { msg.getUser().getNick(), args[0], args[1] }, salas.get(i));
 				}
-			}		
-		}
+			} else{ /* Si el usuario no se encuentra en la sala le enviamos un mensaje de error */
+				constructMessage(Message.TYPE_MSG, Message.PKT_ERR, new String[] {"ERROR: no te encuentras en la sala " + args[0] }, msg.getUser());
+			}
+		
 	}
 	
 	private void constructMessage(Byte type, Byte pkt, String[] args, User user){
