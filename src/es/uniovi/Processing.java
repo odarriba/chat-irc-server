@@ -216,7 +216,14 @@ public class Processing extends Thread{
 			}
 		}
 	}
-
+	
+	/**
+	 * 
+	 * Funcion para dejar una sala
+	 * @param msg con el contenido del usuario y sala que se quiere abandonar
+	 * 
+	 */
+	
 	private void processingLEAVE(Message msg) {
 		String room = msg.getArgs()[0];
 		
@@ -243,6 +250,12 @@ public class Processing extends Thread{
 		}
 	}
 
+	/**
+	 * 
+	 * Funcion para unirse a un sala
+	 * @param msg msg con el contenido del usuario y sala que se quiere entrar
+	 */
+	
 	private void processingJOIN(Message msg){
 		String room = null;
 
@@ -279,6 +292,12 @@ public class Processing extends Thread{
 		}
 	}
 
+	/**
+	 * 
+	 * Funcion para enviar mensajes
+	 * @param msg msg con el todo contenido
+	 */
+	
 	private void processingMSG(Message msg) {
 		String [] args = msg.getArgs(); /* Obtenemos los parametros sala y mesaje */
 		ArrayList<User> users = global.getRoomUsers().get(args[0]);
@@ -294,6 +313,15 @@ public class Processing extends Thread{
 			}
 		
 	}
+	/**
+	 * 
+	 * Funcion para construir los mensajes y enviarlos
+	 * 
+	 * @param type de comando
+	 * @param pkt de paquete
+	 * @param args argumentos del mensaje
+	 * @param user usuario
+	 */
 	
 	private void constructMessage(Byte type, Byte pkt, String[] args, User user){
 		Message msg = new Message();
