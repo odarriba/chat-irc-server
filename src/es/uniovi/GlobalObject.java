@@ -18,8 +18,8 @@ public class GlobalObject {
 	private BufferMessages bufferOutput;
 	private Panel panel;
 	
-	private static final String version = "0.1";
-	private static final String compilationDate = "2013-29-04";
+	private static final String version = "1.0";
+	private static final String compilationDate = "2013-27-05";
 	
 	public GlobalObject() {
 		this.running = true;
