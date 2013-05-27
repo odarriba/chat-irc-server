@@ -11,6 +11,7 @@ import java.util.HashMap;
 public class GlobalObject {
 	private Boolean running;
 	private Boolean debug;
+	private Boolean hasPanel;
 	private HashMap<String,User> nickUsers;
 	private HashMap<String,ArrayList<User> > roomUsers;
 	private BufferMessages bufferInput;
@@ -81,6 +82,20 @@ public class GlobalObject {
 	 * Funciones para trabajar con usuarios
 	 */
 	
+	/**
+	 * @return the hasPanel
+	 */
+	public Boolean getHasPanel() {
+		return hasPanel;
+	}
+
+	/**
+	 * @param hasPanel the hasPanel to set
+	 */
+	public void setHasPanel(Boolean hasPanel) {
+		this.hasPanel = hasPanel;
+	}
+
 	/**
 	 * A�ade un usuario al objeto compartido de usuarios
 	 * @param user Usuario a a�adir

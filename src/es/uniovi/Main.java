@@ -27,6 +27,8 @@ public class Main extends Thread {
 		this.global.setDebug(this.debug);
 		//por defecto no tenemos interfaz
 		this.panel=panel;
+		this.global.setHasPanel(panel);
+		
 		// Arrancar los hilos necesarios
 		
 		this.netOut = new NetworkOut(this.global);
@@ -64,10 +66,11 @@ public class Main extends Thread {
 		// Arrancar los diferentes hilos iniciales de la aplicaci�n
 		this.netOut.start();
 		this.process.start();
+		
 		//solo arracamos la interfaz si se nos indica
-		if(panel)
+		if(this.global.getHasPanel()) {
 			global.getPanel().build();
-		// TODO: Aqui se arrancarian los hilos de procesamiento necesarios
+		}
 		
 		while(this.global.isRunning()) {
 			try {

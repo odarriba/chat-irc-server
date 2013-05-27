@@ -115,8 +115,8 @@ public class Processing extends Thread{
 		
 		/* Enviamos un mensaje de tipo QUIT - INF a todos los usuarios de las salas en las que se encontraba (pero solo una vez)*/
 		ArrayList<User> users_sended = new ArrayList<User>();
-		for (String key: global.getRoomUsers().keySet()) {
-			ArrayList<User> users = global.getRoomUsers().get(key);
+		for (String key: this.global.getRoomUsers().keySet()) {
+			ArrayList<User> users = this.global.getRoomUsers().get(key);
 
 			if (users.contains(msg.getUser())) {
 				for (int i = 0; i < users.size(); i++) {
@@ -128,12 +128,12 @@ public class Processing extends Thread{
 				
 			}
 		}
+		this.global.deleteUser(msg.getUser());
 		
-		
-		global.deleteUser(msg.getUser());
-		
-		//eliminamos al usuario del arbol
-		global.getPanel().delUser(msg.getUser().getNick());
+		if (this.global.getHasPanel()) {
+			//eliminamos al usuario del arbol
+			this.global.getPanel().delUser(msg.getUser().getNick());
+		}
 	}
 
 	/**
@@ -146,9 +146,9 @@ public class Processing extends Thread{
 		String chain = "";
 		String[] args = msg.getArgs(); /* Obtenemos los parametros del objeto mensaje, al ser de tipo WHO solo sera 1 y esta contendra el nombre de la sala */
 		
-		if (global.getRoomUsers().containsKey(args[0])) { /* Comprobamos que exista alguna sala con ese nombre */
+		if (this.global.getRoomUsers().containsKey(args[0])) { /* Comprobamos que exista alguna sala con ese nombre */
 			
-			ArrayList<User> users = global.getRoomUsers().get(args[0]); /* Si existe recogemos todos los usuarios de la sala y concatenamos sus nicks */
+			ArrayList<User> users = this.global.getRoomUsers().get(args[0]); /* Si existe recogemos todos los usuarios de la sala y concatenamos sus nicks */
 			
 			for (int i = 0; i < users.size(); i++) {
 				chain += users.get(i).getNick() + ";" ;	
@@ -163,7 +163,7 @@ public class Processing extends Thread{
 	}
 
 	private void processingLIST(Message msg) {
-		constructMessage(Message.TYPE_LIST, Message.PKT_OK, global.listRooms() , msg.getUser());
+		constructMessage(Message.TYPE_LIST, Message.PKT_OK, this.global.listRooms() , msg.getUser());
 	}
 
 	/**
@@ -177,7 +177,7 @@ public class Processing extends Thread{
 	private void processingNICK(Message msg){
 		String[] args = msg.getArgs(); /* Obtenemos los parametros del objeto mensaje, al ser de tipo NICK solo sera 1 y esta contendra el nuevo nick */
 
-		if (global.getNickUsers().containsKey(args[0])) { 
+		if (this.global.getNickUsers().containsKey(args[0])) { 
 			// Comprobamos si el nick ya esta en uso y si es asi se crear el mensaje de error
 			constructMessage(Message.TYPE_NICK, Message.PKT_ERR, new String[] {  "Nick ya en uso, por favor intentelo de nuevo" }, msg.getUser());
 		} else {
@@ -185,18 +185,20 @@ public class Processing extends Thread{
 			String nick_old = msg.getUser().getNick();
 			
 			// Hacer primero el cambio de nick en las variables globales
-			global.modifyUserNick(msg.getUser(), args[0]);
+			this.global.modifyUserNick(msg.getUser(), args[0]);
 			
 			// Informar al propio usuario de que se le ha cambiado el nombre
 			constructMessage(Message.TYPE_NICK, Message.PKT_OK,  new String[] { nick_old, msg.getUser().getNick() }, msg.getUser());
 
 			/* Ya solo quedaria por una parte avisar a todos los participantes, comando INFO,  que compartan sala con el usuario */
 			
-			//Eliminamos al usuario de todas las salas del arbol
-			global.getPanel().delUser(nick_old);
+			if (this.global.getHasPanel()) {
+				//Eliminamos al usuario de todas las salas del arbol
+				this.global.getPanel().delUser(nick_old);
+			}
 			
-			for (String key: global.getRoomUsers().keySet()) {
-				ArrayList<User> users = global.getRoomUsers().get(key);
+			for (String key: this.global.getRoomUsers().keySet()) {
+				ArrayList<User> users = this.global.getRoomUsers().get(key);
 
 				if (users.contains(msg.getUser())) {
 					for (int i = 0; i < users.size(); i++) {
@@ -204,14 +206,16 @@ public class Processing extends Thread{
 							constructMessage(Message.TYPE_NICK, Message.PKT_INF, new String[] {  nick_old, msg.getUser().getNick()} , users.get(i));
 					}
 					
-					// Volvemos a introducir al usuario en el arbol con el
-					// nuevo nick
-					if(!global.getPanel().isRoom(key)) {
-						//si no existe la creamos
-						global.getPanel().newRoom(key);
+					if (this.global.getHasPanel()) {
+						// Volvemos a introducir al usuario en el arbol con el
+						// nuevo nick
+						if(!this.global.getPanel().isRoom(key)) {
+							//si no existe la creamos
+							this.global.getPanel().newRoom(key);
+						}
+						
+						this.global.getPanel().newUser(key, msg.getUser().getNick());
 					}
-					
-					global.getPanel().newUser(key, msg.getUser().getNick());
 				}
 			}
 		}
@@ -223,13 +227,12 @@ public class Processing extends Thread{
 	 * @param msg con el contenido del usuario y sala que se quiere abandonar
 	 * 
 	 */
-	
 	private void processingLEAVE(Message msg) {
 		String room = msg.getArgs()[0];
 		
-		if (global.IsRoom(room)) {
-			if (global.getRoomUsers().get(room).contains(msg.getUser())) {
-				ArrayList<User> users = global.getRoomUsers().get(room);
+		if (this.global.IsRoom(room)) {
+			if (this.global.getRoomUsers().get(room).contains(msg.getUser())) {
+				ArrayList<User> users = this.global.getRoomUsers().get(room);
 
 				for (int i = 0; i < users.size(); i++) {
 					if (users.get(i).getNick() == (msg.getUser().getNick())) {
@@ -240,10 +243,12 @@ public class Processing extends Thread{
 
 				}
 				
-				global.removeUsertoRoom(msg.getUser(), room);
+				this.global.removeUsertoRoom(msg.getUser(), room);
 				
-				//Lo sacamos de la sala en el arbol
-				global.getPanel().delUser(room, msg.getUser().getNick());
+				if (this.global.getHasPanel()) {
+					//Lo sacamos de la sala en el arbol
+					this.global.getPanel().delUser(room, msg.getUser().getNick());
+				}
 			} else {
 				constructMessage(Message.TYPE_LEAVE, Message.PKT_ERR,  new String[] { "ERROR: Actualmente no esta en esta sala, por lo que no puedes salir de ella" } , msg.getUser());
 			}
@@ -255,7 +260,6 @@ public class Processing extends Thread{
 	 * Funcion para unirse a un sala
 	 * @param msg msg con el contenido del usuario y sala que se quiere entrar
 	 */
-	
 	private void processingJOIN(Message msg){
 		String room = null;
 
@@ -266,20 +270,23 @@ public class Processing extends Thread{
 			e.printStackTrace();
 		}
 
-		if (global.userInRoom(msg.getUser(), room)) {
+		if (this.global.userInRoom(msg.getUser(), room)) {
 			constructMessage(Message.TYPE_JOIN, Message.PKT_ERR, new String[] {  "ERROR: El usuario ya se encuentra en esta sala" } , msg.getUser());
 		} else {
-			global.addUsertoRoom(msg.getUser(), room);
-			//introducimos al usuario en el arbol 
-			//primero comprobamos si existe la sala
-			if(!global.getPanel().isRoom(room)) {
-				//si no existe la creamos
-				global.getPanel().newRoom(room);
-			}
+			this.global.addUsertoRoom(msg.getUser(), room);
 			
-			global.getPanel().newUser(room, msg.getUser().getNick());
+			if (this.global.getHasPanel()) {
+				//introducimos al usuario en el arbol 
+				//primero comprobamos si existe la sala
+				if(!this.global.getPanel().isRoom(room)) {
+					//si no existe la creamos
+					this.global.getPanel().newRoom(room);
+				}
+			
+				this.global.getPanel().newUser(room, msg.getUser().getNick());
+			}
 	
-			ArrayList<User> users = global.getRoomUsers().get(room);
+			ArrayList<User> users = this.global.getRoomUsers().get(room);
 
 			for (int i = 0; i < users.size(); i++) {
 				if (users.get(i).getNick() == (msg.getUser().getNick())) { 
@@ -297,21 +304,20 @@ public class Processing extends Thread{
 	 * Funcion para enviar mensajes
 	 * @param msg msg con el todo contenido
 	 */
-	
 	private void processingMSG(Message msg) {
 		String [] args = msg.getArgs(); /* Obtenemos los parametros sala y mesaje */
-		ArrayList<User> users = global.getRoomUsers().get(args[0]);
+		ArrayList<User> users = this.global.getRoomUsers().get(args[0]);
 		
-			if (global.getRoomUsers().containsKey(args[0]) && users.contains(msg.getUser())) { /* Comprobamos que exista la sala y se encuentre en ella */
-				ArrayList<User> salas = global.getRoomUsers().get(args[0]); /* Obtenemos todos los usuarios de esa sala */
-				
-				for (int i = 0; i < salas.size(); i++) { /* Para cada uno le generamos un mensaje a medida */
-					constructMessage(Message.TYPE_MSG, Message.PKT_INF, new String[] { msg.getUser().getNick(), args[0], args[1] }, salas.get(i));
-				}
-			} else{ /* Si el usuario no se encuentra en la sala le enviamos un mensaje de error */
-				constructMessage(Message.TYPE_MSG, Message.PKT_ERR, new String[] {"ERROR: no te encuentras en la sala " + args[0] }, msg.getUser());
+		if (this.global.getRoomUsers().containsKey(args[0]) && users.contains(msg.getUser())) { /* Comprobamos que exista la sala y se encuentre en ella */
+			ArrayList<User> salas = this.global.getRoomUsers().get(args[0]); /* Obtenemos todos los usuarios de esa sala */
+
+			for (int i = 0; i < salas.size(); i++) { /* Para cada uno le generamos un mensaje a medida */
+				constructMessage(Message.TYPE_MSG, Message.PKT_INF, new String[] { msg.getUser().getNick(), args[0], args[1] }, salas.get(i));
 			}
-		
+		} else{ /* Si el usuario no se encuentra en la sala le enviamos un mensaje de error */
+			constructMessage(Message.TYPE_MSG, Message.PKT_ERR, new String[] {"ERROR: no te encuentras en la sala " + args[0] }, msg.getUser());
+		}
+
 	}
 	/**
 	 * 
