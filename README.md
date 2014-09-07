@@ -1,7 +1,7 @@
 Chat IRC server
 ===============
 
-An IRC-style chat server written in Java (you can find the client here: [chat-irc-client](https://github.com/odarriba/chat-irc-client).
+An IRC-style chat server written in Java. You can find the client here: [chat-irc-client](https://github.com/odarriba/chat-irc-client).
 
 It uses a binary protocol very similar (but not compatible) to original IRC protocol.
 
